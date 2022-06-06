@@ -116,29 +116,29 @@ def show_venue(venue_id):
   # TODO: replace with real venue data from the venues table, using venue_id
   venue = Venue.query.get(venue_id)
   now = datetime.now()
-  upcoming = Show.query.filter(Show.venue_id == venue.id, Show.start_time > now).all()
-  past = Show.query.filter(Show.venue_id == venue.id, Show.start_time < now).all()
+  past = db.session.query(Artist).join(Show).filter(Show.venue_id==venue_id).filter(Show.start_time < now).all()
+  upcoming = db.session.query(Artist).join(Show).filter(Show.venue_id==venue_id).filter(Show.start_time > now).all()
   upcoming_shows = []
   past_shows = []
 
-  for show in upcoming:
-    artist = Artist.query.get(show.artist_id)
-    data = {
-      "artist_id": show.artist_id,
-      "artist_name": artist.name,
-      "artist_image_link": artist.image_link,
-      "start_time": format_datetime(value=str(show.start_time), format="full")
-    }
+  for artist in upcoming:
+    for show in artist.venues:
+      data = {
+        "artist_id": show.artist_id,
+        "artist_name": artist.name,
+        "artist_image_link": artist.image_link,
+        "start_time": format_datetime(value=str(show.start_time), format="full")
+      }
     upcoming_shows.append(data)
 
-  for show in past:
-    artist = Artist.query.get(show.artist_id)
-    data = {
-      "artist_id": show.artist_id,
-      "artist_name": artist.name,
-      "artist_image_link": artist.image_link,
-      "start_time": format_datetime(value=str(show.start_time), format="full")
-    }
+  for artist in past:
+    for show in artist.venues:
+      data = {
+        "artist_id": show.artist_id,
+        "artist_name": artist.name,
+        "artist_image_link": artist.image_link,
+        "start_time": format_datetime(value=str(show.start_time), format="full")
+      }
     past_shows.append(data)
 
   data={
